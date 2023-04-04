@@ -8,6 +8,8 @@ class VillainsController < ApplicationController
         villain = Villain.create(villain_params)
         if villain.valid? 
           render json: villain
+        else
+            render json: villain.errors, status: 422
         end
     end
 
@@ -16,6 +18,8 @@ class VillainsController < ApplicationController
         villain.update(villain_params)
         if villain.valid? 
           render json: villain
+        else
+            render json: villain.errors, status: 422
         end
     end
     

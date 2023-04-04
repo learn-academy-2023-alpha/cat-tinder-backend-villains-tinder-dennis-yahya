@@ -45,6 +45,78 @@ RSpec.describe "Villains", type: :request do
       expect(villain.enjoy).to eq 'Messing with Batman'
       expect(villain.img).to eq "https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg"
     end
+
+    it "doesn't create a villain without a name" do
+      villain_params = {
+        villain: {
+          age: 34,
+          enjoy: 'Messing with Batman',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+      # Send the request to the  server
+      post '/villains', params: villain_params
+      # expect an error if the villain_params does not have a name
+      expect(response.status).to eq 422
+      # Convert the JSON response into a Ruby Hash
+      json = JSON.parse(response.body)
+      # Errors are returned as an array because there could be more than one, if there are more than one validation failures on an attribute.
+      expect(json['name']).to include "can't be blank"
+    end
+  
+    it "doesn't create a villain without an age" do
+      villain_params = {
+        villain: {
+          name: 'Joker',
+          enjoy: 'Messing with Batman',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+      # Send the request to the  server
+      post '/villains', params: villain_params
+      # expect an error if the villain_params does not have a name
+      expect(response.status).to eq 422
+      # Convert the JSON response into a Ruby Hash
+      json = JSON.parse(response.body)
+      # Errors are returned as an array because there could be more than one, if there are more than one validation failures on an attribute.
+      expect(json['age']).to include "can't be blank"
+    end
+  
+    it "doesn't create a villain without an enjoy" do
+      villain_params = {
+        villain: {
+          name: 'Joker',
+          age: 34,
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+      # Send the request to the  server
+      post '/villains', params: villain_params
+      # expect an error if the villain_params does not have a name
+      expect(response.status).to eq 422
+      # Convert the JSON response into a Ruby Hash
+      json = JSON.parse(response.body)
+      # Errors are returned as an array because there could be more than one, if there are more than one validation failures on an attribute.
+      expect(json['enjoy']).to include "can't be blank"
+    end
+    
+    it "doesn't create a villain without an img" do
+      villain_params = {
+        villain: {
+          name: 'Joker',
+          age: 34,
+          enjoy: 'Messing with Batman'
+        }
+      }
+      # Send the request to the  server
+      post '/villains', params: villain_params
+      # expect an error if the villain_params does not have a name
+      expect(response.status).to eq 422
+      # Convert the JSON response into a Ruby Hash
+      json = JSON.parse(response.body)
+      # Errors are returned as an array because there could be more than one, if there are more than one validation failures on an attribute.
+      expect(json['img']).to include "can't be blank"
+    end
   end
 
   describe "PATCH /update" do 
@@ -77,6 +149,130 @@ RSpec.describe "Villains", type: :request do
       expect(response).to have_http_status(200)
       expect(updated_villain.age).to eq 50
     end
+
+    it "doesn't update a villain if it is not valid" do
+      villain_params = {
+        villain: {
+          name: 'Joker',
+          age: 34,
+          enjoy: 'Messing with Batman',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+
+    post '/villains', params: villain_params 
+      villain = Villain.first
+
+      updated_villain_params = {
+        villain: {
+          name: '',
+          age: 34,
+          enjoy: 'Causing havoc in Gotham',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+      patch "/villains/#{villain.id}", params: updated_villain_params
+
+      # Create a variable to store the updated villain by finding the original villain created in this test
+      updated_villain = Villain.find(villain.id)
+      expect(response.status).to eq 422
+      json = JSON.parse(response.body)
+      expect(json['name']).to include "can't be blank"
+    end
+
+    it "doesn't update a villain if it is not valid" do
+      villain_params = {
+        villain: {
+          name: 'Joker',
+          age: 34,
+          enjoy: 'Messing with Batman',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+
+    post '/villains', params: villain_params 
+      villain = Villain.first
+
+      updated_villain_params = {
+        villain: {
+          name: 'Joker',
+          age: nil,
+          enjoy: 'Causing havoc in Gotham',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+
+      patch "/villains/#{villain.id}", params: updated_villain_params
+
+      # Create a variable to store the updated villain by finding the original villain created in this test
+      updated_villain = Villain.find(villain.id)
+      expect(response.status).to eq 422
+      json = JSON.parse(response.body)
+      expect(json['age']).to include "can't be blank"
+    end
+
+    it "doesn't update a villain if it is not valid" do
+      villain_params = {
+        villain: {
+          name: 'Joker',
+          age: 34,
+          enjoy: 'Messing with Batman',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+
+    post '/villains', params: villain_params 
+      villain = Villain.first
+
+      updated_villain_params = {
+        villain: {
+          name: 'Joker',
+          age: 34,
+          enjoy: '',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+
+      patch "/villains/#{villain.id}", params: updated_villain_params
+
+      # Create a variable to store the updated villain by finding the original villain created in this test
+      updated_villain = Villain.find(villain.id)
+      expect(response.status).to eq 422
+      json = JSON.parse(response.body)
+      expect(json['enjoy']).to include "can't be blank"
+    end
+
+    it "doesn't update a villain if it is not valid" do
+      villain_params = {
+        villain: {
+          name: 'Joker',
+          age: 34,
+          enjoy: 'Messing with Batman',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+        }
+      }
+
+    post '/villains', params: villain_params 
+      villain = Villain.first
+
+      updated_villain_params = {
+        villain: {
+          name: 'Joker',
+          age: 34,
+          enjoy: 'Messing with Batman',
+          img: ''
+        }
+      }
+
+      patch "/villains/#{villain.id}", params: updated_villain_params
+
+      # Create a variable to store the updated villain by finding the original villain created in this test
+      updated_villain = Villain.find(villain.id)
+      expect(response.status).to eq 422
+      json = JSON.parse(response.body)
+      expect(json['img']).to include "can't be blank"
+    end
+
   end
 
   describe "DELETE /destroy" do 
@@ -85,8 +281,8 @@ RSpec.describe "Villains", type: :request do
         villain: {
           name: 'Joker',
           age: 34,
-          enjoys: 'Messing with Batman',
-          image: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
+          enjoy: 'Messing with Batman',
+          img: 'https://live.staticflickr.com/5448/30578142333_fd9ee3dcc5_b.jpg'
         }
       }
       post '/villains', params: villain_params 
@@ -98,5 +294,4 @@ RSpec.describe "Villains", type: :request do
       expect(villains).to be_empty
     end
   end
-
 end
